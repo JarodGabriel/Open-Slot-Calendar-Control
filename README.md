@@ -103,6 +103,12 @@ HOST_BUSY_CALENDAR_IDS="work@yourcompany.com,abc123@group.calendar.google.com"
 A calendar the account can't read is logged and skipped, never failing the
 whole availability lookup.
 
+**Finding your calendar IDs the easy way:** once Google is connected, visit
+`/api/setup/calendars?key=YOUR_GOOGLE_CLIENT_SECRET` — it lists every calendar
+the connected account can see, with each `id`, so you can copy the right values
+into `HOST_CALENDAR_ID` / `HOST_BUSY_CALENDAR_IDS`. It's gated behind your client
+secret, so the list isn't public.
+
 ### The meeting lengths & colors
 
 The four lengths and their accent/tint colors live in
