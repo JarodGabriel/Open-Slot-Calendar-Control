@@ -42,7 +42,9 @@ export async function POST(req: NextRequest) {
 
   const startISO = new Date(startInst).toISOString();
   const endISO = new Date(startInst + durationMin * 60000).toISOString();
-  const title = `${durationMin} Minute Meeting with ${config.hostName}`;
+  // Include the guest's name so the host can tell bookings apart at a glance
+  // (otherwise every event on the host's calendar reads identically).
+  const title = `${durationMin} Minute Meeting — ${name} & ${config.hostName}`;
 
   try {
     const provider = getProvider();

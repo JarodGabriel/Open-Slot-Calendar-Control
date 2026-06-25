@@ -48,7 +48,7 @@ export function buildIcs(input: IcsInput): string {
     `DTSTAMP:${fmtUtc(new Date(input.startInst))}`,
     `DTSTART:${fmtUtc(start)}`,
     `DTEND:${fmtUtc(end)}`,
-    `SUMMARY:${esc(`${input.durationMin} Minute Meeting with ${config.hostName}`)}`,
+    `SUMMARY:${esc(`${input.durationMin} Minute Meeting — ${input.name || "Guest"} & ${config.hostName}`)}`,
     "LOCATION:Google Meet",
     `DESCRIPTION:${esc(desc)}`,
     `ATTENDEE;CN=${esc(input.name || "Guest")}:mailto:${input.email || ""}`,
