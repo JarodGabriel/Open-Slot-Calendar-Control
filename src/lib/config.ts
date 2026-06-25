@@ -22,7 +22,8 @@ export const config = {
   // Public — display
   hostName: process.env.NEXT_PUBLIC_HOST_NAME || "Jarod Gabriel M.",
   hostInitials: process.env.NEXT_PUBLIC_HOST_INITIALS || "JM",
-  hostTagline: process.env.NEXT_PUBLIC_HOST_TAGLINE || "I’m listening.",
+  // Optional: leave unset/empty to show no tagline at all.
+  hostTagline: process.env.NEXT_PUBLIC_HOST_TAGLINE ?? "",
   allowWeekends: (process.env.NEXT_PUBLIC_ALLOW_WEEKENDS || "false") === "true",
 
   // Server — availability

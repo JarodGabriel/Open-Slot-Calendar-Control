@@ -507,9 +507,11 @@ export default function Scheduler({
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 13, color: "#7a8794", fontWeight: 500 }}>{config.hostName}</div>
-              <div style={{ fontSize: 12, color: "#9aa3ad", fontStyle: "italic" }}>
-                &ldquo;{config.hostTagline}&rdquo;
-              </div>
+              {config.hostTagline && (
+                <div style={{ fontSize: 12, color: "#9aa3ad", fontStyle: "italic" }}>
+                  &ldquo;{config.hostTagline}&rdquo;
+                </div>
+              )}
             </div>
           </div>
 
