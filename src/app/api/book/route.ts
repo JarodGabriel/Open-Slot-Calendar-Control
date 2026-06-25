@@ -5,8 +5,9 @@
 
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { config } from "@/lib/config";
+import { config, MEETING_LABELS, type MeetingType } from "@/lib/config";
 import { getProvider, isDemoMode } from "@/lib/calendar";
+import type { Conferencing } from "@/lib/calendar/provider";
 import { signBookingToken } from "@/lib/token";
 
 const EMAIL_RE = /.+@.+\..+/;
@@ -17,6 +18,7 @@ interface BookBody {
   name?: string;
   email?: string;
   note?: string;
+  meetingType?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -41,6 +43,20 @@ export async function POST(req: NextRequest) {
   }
   if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
+
+  // Resolve conferencing: only honor a requested type the host actually offers.
+  const requested = body.meetingType as MeetingType | undefined;
+  const meetingType: MeetingType =
+    requested && config.meetingOptions.includes(requested) ? requested : config.meetingOptions[0];
+  let conferencing: Conferencing;
+  if (meetingType === "zoom") {
+    if (!config.zoomUrl) {
+      return NextResponse.json({ error: "Zoom isn’t configured for this host." }, { status: 400 });
+    }
+    conferencing = { type: "zoom", url: config.zoomUrl };
+  } else {
+    conferencing = { type: "meet" };
+  }
 
   const startISO = new Date(startInst).toISOString();
   const endISO = new Date(startInst + durationMin * 60000).toISOString();
@@ -76,12 +92,15 @@ export async function POST(req: NextRequest) {
       attendeeEmail: email,
       attendeeName: name,
       note: description,
+      conferencing,
     });
     return NextResponse.json({
       ok: true,
       demo: isDemoMode(),
       eventId: result.id,
       meetingUrl: result.meetingUrl ?? null,
+      meetingType,
+      meetingLabel: MEETING_LABELS[meetingType],
       summary: title,
       rescheduleUrl,
       cancelUrl,

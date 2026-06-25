@@ -7,6 +7,10 @@ export interface BusyRange {
   end: string; // ISO 8601
 }
 
+/** How the meeting is held. "meet" auto-generates a Google Meet link; "zoom"
+ *  attaches a fixed Zoom URL; "none" adds no video link. */
+export type Conferencing = { type: "meet" } | { type: "zoom"; url: string } | { type: "none" };
+
 export interface CreateEventInput {
   /** Optional caller-chosen event id (so reschedule/cancel links can be built
    *  up front). Must be a valid Google event id ([a-v0-9], 5–1024 chars). */
@@ -18,6 +22,8 @@ export interface CreateEventInput {
   attendeeEmail: string;
   attendeeName: string;
   note?: string;
+  /** Defaults to Google Meet when omitted. */
+  conferencing?: Conferencing;
 }
 
 export interface CreateEventResult {

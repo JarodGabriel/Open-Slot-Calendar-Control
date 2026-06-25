@@ -43,7 +43,14 @@ export class DemoProvider implements CalendarProvider {
     const id =
       input.id ||
       `demo-${Buffer.from(`${input.startISO}-${input.attendeeEmail}`).toString("base64url").slice(0, 16)}`;
-    return { id, meetingUrl: "https://meet.google.com/demo-not-a-real-link" };
+    const c = input.conferencing ?? { type: "meet" };
+    const meetingUrl =
+      c.type === "zoom"
+        ? c.url || "https://zoom.us/j/demo-not-a-real-link"
+        : c.type === "none"
+          ? undefined
+          : "https://meet.google.com/demo-not-a-real-link";
+    return { id, meetingUrl };
   }
 
   // Demo mode keeps no state, so reschedule/cancel just succeed as no-ops and

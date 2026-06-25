@@ -72,11 +72,13 @@ export class GoogleProvider implements CalendarProvider {
 
   async createEvent(input: CreateEventInput): Promise<CreateEventResult> {
     const calendar = calendarClient();
+    const conferencing = input.conferencing ?? { type: "meet" };
+    const useMeet = conferencing.type === "meet";
     const requestId = `${input.startISO}-${input.attendeeEmail}`.replace(/[^a-zA-Z0-9]/g, "").slice(0, 64);
 
     const res = await calendar.events.insert({
       calendarId: config.calendarId,
-      conferenceDataVersion: 1,
+      conferenceDataVersion: useMeet ? 1 : 0,
       sendUpdates: "all",
       requestBody: {
         id: input.id, // caller-chosen id (so links exist before insert)
@@ -85,20 +87,22 @@ export class GoogleProvider implements CalendarProvider {
         start: { dateTime: input.startISO, timeZone: input.hostTz },
         end: { dateTime: input.endISO, timeZone: input.hostTz },
         attendees: [{ email: input.attendeeEmail, displayName: input.attendeeName }],
-        conferenceData: {
-          createRequest: {
-            requestId,
-            conferenceSolutionKey: { type: "hangoutsMeet" },
-          },
-        },
+        // Zoom uses a fixed link stored as the event location; Meet is generated.
+        location: conferencing.type === "zoom" ? conferencing.url : undefined,
+        conferenceData: useMeet
+          ? { createRequest: { requestId, conferenceSolutionKey: { type: "hangoutsMeet" } } }
+          : undefined,
         reminders: { useDefault: true },
       },
     });
 
-    return {
-      id: res.data.id ?? input.id ?? "",
-      meetingUrl: res.data.hangoutLink ?? undefined,
-    };
+    const meetingUrl = useMeet
+      ? (res.data.hangoutLink ?? undefined)
+      : conferencing.type === "zoom"
+        ? conferencing.url
+        : undefined;
+
+    return { id: res.data.id ?? input.id ?? "", meetingUrl };
   }
 
   async getEvent(eventId: string): Promise<EventInfo | null> {

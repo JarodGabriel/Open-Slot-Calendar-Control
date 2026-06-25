@@ -31,6 +31,9 @@ buttons all recolor to match.
 - **Reschedule & cancel links** — every booking comes with Calendly-style reschedule and
   cancel links (in the invite and on the confirmation screen), secured with signed tokens
   so only the guest can change their own meeting.
+- **Google Meet and/or Zoom** — auto-generate a Meet link, attach a fixed Zoom link, or
+  offer both and let the guest pick at booking. Set `NEXT_PUBLIC_MEETING_OPTIONS`
+  (e.g. `meet,zoom`) and `ZOOM_MEETING_URL`.
 - **Conflict-aware across all your calendars** — check free/busy across as many calendars
   as you like (work, health, side projects), so a meeting on *any* of them automatically
   removes that slot and you never get double-booked. See

@@ -9,6 +9,8 @@ export interface IcsInput {
   name: string;
   email: string;
   note?: string;
+  /** Meeting location — a join URL or label like "Google Meet" / "Zoom". */
+  location?: string;
 }
 
 function fmtUtc(d: Date): string {
@@ -49,7 +51,7 @@ export function buildIcs(input: IcsInput): string {
     `DTSTART:${fmtUtc(start)}`,
     `DTEND:${fmtUtc(end)}`,
     `SUMMARY:${esc(`${input.durationMin} Minute Meeting — ${input.name || "Guest"} & ${config.hostName}`)}`,
-    "LOCATION:Google Meet",
+    `LOCATION:${esc(input.location || "Google Meet")}`,
     `DESCRIPTION:${esc(desc)}`,
     `ATTENDEE;CN=${esc(input.name || "Guest")}:mailto:${input.email || ""}`,
     "END:VEVENT",

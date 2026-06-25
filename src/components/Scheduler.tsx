@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { config } from "@/lib/config";
+import { config, MEETING_LABELS, type MeetingType } from "@/lib/config";
 import {
   DURATIONS,
   DEFAULT_DURATION,
@@ -104,6 +104,8 @@ export default function Scheduler({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
+  const [meetingType, setMeetingType] = useState<MeetingType>(config.meetingOptions[0]);
+  const meetingLabel = MEETING_LABELS[meetingType];
 
   const [slots, setSlots] = useState<number[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -199,6 +201,7 @@ export default function Scheduler({
           name: name.trim(),
           email: email.trim(),
           note,
+          meetingType,
         }),
       });
       const data = await res.json();
@@ -213,7 +216,7 @@ export default function Scheduler({
     } finally {
       setBooking(false);
     }
-  }, [selTime, name, email, note, durMins]);
+  }, [selTime, name, email, note, durMins, meetingType]);
 
   const doReschedule = useCallback(async () => {
     if (!selTime || !reschedule) return;
@@ -255,7 +258,14 @@ export default function Scheduler({
 
   const downloadIcs = () => {
     if (!selTime) return;
-    const ics = buildIcs({ durationMin: durMins || 30, startInst: selTime.inst, name, email, note });
+    const ics = buildIcs({
+      durationMin: durMins || 30,
+      startInst: selTime.inst,
+      name,
+      email,
+      note,
+      location: meetingUrl || meetingLabel,
+    });
     const blob = new Blob([ics], { type: "text/calendar" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -274,14 +284,14 @@ export default function Scheduler({
     const start = new Date(selTime.inst);
     const end = new Date(selTime.inst + (durMins || 30) * 60000);
     const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const details = [meetingUrl ? `Google Meet: ${meetingUrl}` : "", note]
+    const details = [meetingUrl ? `${meetingLabel}: ${meetingUrl}` : "", note]
       .filter(Boolean)
       .join("\n\n");
     const params = new URLSearchParams({
       action: "TEMPLATE",
       text: `${durMins || 30} Minute Meeting with ${config.hostName}`,
       dates: `${fmt(start)}/${fmt(end)}`,
-      location: meetingUrl || "Google Meet",
+      location: meetingUrl || meetingLabel,
     });
     if (details) params.set("details", details);
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -518,7 +528,8 @@ export default function Scheduler({
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 13 }}>
             <Video style={{ flex: "none" }} />
             <span style={{ fontSize: 12.5, color: "#5a6573" }}>
-              Google Meet &mdash; link sent on confirmation
+              {config.meetingOptions.map((t) => MEETING_LABELS[t]).join(" or ")} &mdash; link sent on
+              confirmation
             </span>
           </div>
 
@@ -993,9 +1004,47 @@ export default function Scheduler({
                     style={{ ...inputStyle, lineHeight: 1.5 }}
                   />
                 </label>
+                {config.meetingOptions.length > 1 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "#46505c" }}>
+                      How should we meet?
+                    </span>
+                    <div style={{ display: "flex", gap: 9 }}>
+                      {config.meetingOptions.map((t) => {
+                        const selected = t === meetingType;
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setMeetingType(t)}
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: 8,
+                              padding: "11px 12px",
+                              borderRadius: 9,
+                              border: `1.5px solid ${selected ? accent : "#d4dae1"}`,
+                              background: selected ? tint : "#fff",
+                              color: "#15233a",
+                              fontSize: 14,
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              transition: "all .12s",
+                            }}
+                          >
+                            <Video size={16} stroke={selected ? accent : "#7a8794"} width={1.9} />
+                            {MEETING_LABELS[t]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <div style={{ fontSize: 12, color: "#9aa3ad", lineHeight: 1.5 }}>
-                  By proceeding, you confirm a calendar invite with a Google Meet link will be sent to
-                  your email.
+                  By proceeding, you confirm a calendar invite with a {meetingLabel} link will be sent
+                  to your email.
                 </div>
                 {bookError && (
                   <div style={{ fontSize: 13, color: "#d04646", fontWeight: 500 }}>{bookError}</div>
@@ -1096,10 +1145,10 @@ export default function Scheduler({
                   <Video size={18} />
                   {meetingUrl && !demo ? (
                     <a href={meetingUrl} target="_blank" rel="noreferrer" style={{ ...recapText, color: "#1a45c0" }}>
-                      Google Meet
+                      {meetingLabel}
                     </a>
                   ) : (
-                    <span style={recapText}>Google Meet</span>
+                    <span style={recapText}>{meetingLabel}</span>
                   )}
                 </div>
               </div>
