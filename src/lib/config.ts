@@ -9,6 +9,15 @@ function num(v: string | undefined, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function list(v: string | undefined): string[] {
+  return (v || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+const calendarId = process.env.HOST_CALENDAR_ID || "primary";
+
 export const config = {
   // Public — display
   hostName: process.env.NEXT_PUBLIC_HOST_NAME || "Jarod Gabriel M.",
@@ -20,5 +29,11 @@ export const config = {
   hostTz: process.env.HOST_TIMEZONE || "America/Los_Angeles",
   workStartHour: num(process.env.WORK_START_HOUR, 9),
   workEndHour: num(process.env.WORK_END_HOUR, 17),
-  calendarId: process.env.HOST_CALENDAR_ID || "primary",
+
+  // The calendar new bookings are CREATED on.
+  calendarId,
+  // Every calendar checked for conflicts (free/busy). The booking calendar is
+  // always included; HOST_BUSY_CALENDAR_IDS adds extra calendars (comma-
+  // separated IDs) so a busy block on ANY of them removes the slot.
+  busyCalendarIds: Array.from(new Set([calendarId, ...list(process.env.HOST_BUSY_CALENDAR_IDS)])),
 } as const;

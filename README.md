@@ -79,7 +79,29 @@ browser; the rest are server-side.
 | `HOST_TIMEZONE` | IANA zone your working hours are defined in | `America/Los_Angeles` |
 | `WORK_START_HOUR` / `WORK_END_HOUR` | Bookable window, 24h clock | `9` / `17` |
 | `NEXT_PUBLIC_ALLOW_WEEKENDS` | Allow Saturday/Sunday bookings | `false` |
-| `HOST_CALENDAR_ID` | Which Google calendar to read/write | `primary` |
+| `HOST_CALENDAR_ID` | Calendar new bookings are created on | `primary` |
+| `HOST_BUSY_CALENDAR_IDS` | Extra calendars to check for conflicts (see below) | _(none)_ |
+
+#### Blocking across multiple calendars
+
+By default OpenSlot only checks `HOST_CALENDAR_ID` for conflicts. To stop
+double-bookings against your *other* calendars (work, health, a side project),
+add their calendar IDs — comma-separated — to `HOST_BUSY_CALENDAR_IDS`. A busy
+block on **any** listed calendar (the booking calendar is always included)
+removes that slot.
+
+Each calendar must be **visible to the connected Google account** — share it
+into that account with at least *See free/busy* access, the same way you'd
+overlay calendars in Google Calendar. Find a calendar's ID in **Google Calendar
+→ that calendar's Settings → "Integrate calendar" → Calendar ID** (looks like an
+email or `…@group.calendar.google.com`). Example:
+
+```ini
+HOST_BUSY_CALENDAR_IDS="work@yourcompany.com,abc123@group.calendar.google.com"
+```
+
+A calendar the account can't read is logged and skipped, never failing the
+whole availability lookup.
 
 ### The meeting lengths & colors
 

@@ -42,18 +42,31 @@ function calendarClient() {
 export class GoogleProvider implements CalendarProvider {
   async getBusy(fromISO: string, toISO: string): Promise<BusyRange[]> {
     const calendar = calendarClient();
+    const ids = config.busyCalendarIds;
     const res = await calendar.freebusy.query({
       requestBody: {
         timeMin: fromISO,
         timeMax: toISO,
-        items: [{ id: config.calendarId }],
+        items: ids.map((id) => ({ id })),
       },
     });
-    const cal = res.data.calendars?.[config.calendarId];
-    const busy = cal?.busy ?? [];
-    return busy
-      .filter((b): b is { start: string; end: string } => Boolean(b.start && b.end))
-      .map((b) => ({ start: b.start, end: b.end }));
+
+    const calendars = res.data.calendars ?? {};
+    const out: BusyRange[] = [];
+    for (const id of ids) {
+      const entry = calendars[id];
+      if (!entry) continue;
+      // A calendar we can't read (not shared, wrong id) reports errors here —
+      // log and skip it rather than failing the whole availability lookup.
+      if (entry.errors?.length) {
+        console.warn(`freebusy: skipping calendar "${id}":`, entry.errors);
+        continue;
+      }
+      for (const b of entry.busy ?? []) {
+        if (b.start && b.end) out.push({ start: b.start, end: b.end });
+      }
+    }
+    return out;
   }
 
   async createEvent(input: CreateEventInput): Promise<CreateEventResult> {
