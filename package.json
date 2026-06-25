@@ -1,0 +1,25 @@
+{
+  "name": "openslot",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "description": "OpenSlot — a free, open-source, self-hostable Calendly-style scheduling page that books meetings on your own Google Calendar.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}

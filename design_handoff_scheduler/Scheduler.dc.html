@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;}
+    body{margin:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+    input,textarea,button,select{font-family:inherit;outline:none;}
+    textarea{resize:none;}
+    ::placeholder{color:#9aa3ad;opacity:1;}
+    .tzsel{appearance:none;-webkit-appearance:none;background:transparent;border:none;cursor:pointer;}
+    .col::-webkit-scrollbar{width:8px;}
+    .col::-webkit-scrollbar-thumb{background:#dfe3e8;border-radius:4px;}
+    .col::-webkit-scrollbar-track{background:transparent;}
+  </style>
+</helmet>
+
+<div style="min-height:100vh; width:100%; box-sizing:border-box; padding:40px 24px; background:#eef1f5; font-family:'Public Sans',-apple-system,'Segoe UI',sans-serif; display:flex; align-items:flex-start; justify-content:center;">
+
+  <div data-screen-label="Scheduling page" ref="{{ rootRef }}" style="--ca:#9C4DC8; --ct:#f5edfa; --caa:rgba(156,77,200,.2); --cab:rgba(156,77,200,.35); width:100%; max-width:1060px; min-height:660px; background:#ffffff; border:1px solid #e7ebf0; border-radius:16px; box-shadow:0 1px 2px rgba(20,40,80,.04), 0 22px 60px rgba(20,40,80,.12); display:flex; overflow:hidden;">
+
+    <!-- ===================== LEFT RAIL ===================== -->
+    <div style="width:336px; flex:none; border-right:1px solid #eef1f4; padding:30px 30px 26px; display:flex; flex-direction:column;">
+
+      <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ back }}" style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid #e2e7ec; background:#fff; cursor:pointer; color:#5a6573; margin-bottom:18px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </sc-if>
+
+      <div style="display:flex; align-items:center; gap:11px;">
+        <div style="width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,#2563eb,#1a45c0); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:600; flex:none;">JM</div>
+        <div style="min-width:0;">
+          <div style="font-size:13px; color:#7a8794; font-weight:500;">Jarod Gabriel M.</div>
+          <div style="font-size:12px; color:#9aa3ad; font-style:italic;">&ldquo;I&rsquo;m listening.&rdquo;</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px; margin-top:13px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M15 10l4.55-2.6A1 1 0 0 1 21 8.27v7.46a1 1 0 0 1-1.45.87L15 14M4 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></svg>
+        <span style="font-size:12.5px; color:#5a6573;">Google Meet &mdash; link sent on confirmation</span>
+      </div>
+
+      <h1 style="font-size:25px; font-weight:700; color:#15233a; letter-spacing:-0.02em; margin:18px 0 0; line-height:1.2;">{{ meetingTitle }}</h1>
+
+      <!-- SELECT step: duration chooser -->
+      <sc-if value="{{ isSelect }}" hint-placeholder-val="{{ true }}">
+        <div style="font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:#9aa3ad; margin:24px 0 10px;">Meeting length</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <sc-for list="{{ durations }}" as="d" hint-placeholder-count="4">
+            <button onClick="{{ d.onClick }}" data-dur="{{ d.k }}" data-dur-color="{{ d.color }}" data-dur-tint="{{ d.tint }}" style="{{ d.style }}">
+              <span style="{{ d.radio }}"><span style="{{ d.dot }}"></span></span>
+              <span style="flex:1; text-align:left; font-size:14.5px; font-weight:600;">{{ d.title }}</span>
+              <span style="font-size:12.5px; color:#8a96a3; font-weight:500;">{{ d.blurb }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ isCustom }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:10px; display:flex; align-items:center; gap:9px;">
+            <input value="{{ customMins }}" onChange="{{ setCustom }}" placeholder="45" inputmode="numeric" style="width:72px; border:1.5px solid #d4dae1; border-radius:8px; font-size:14.5px; text-align:center; color:#15233a; padding:9px 8px;">
+            <span style="font-size:13px; color:#7a8794;">minutes</span>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <!-- DETAILS / DONE: summary -->
+      <sc-if value="{{ showSummary }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:14px; margin-top:22px;">
+          <div style="display:flex; align-items:flex-start; gap:11px;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span style="font-size:14px; font-weight:600; color:#46505c;">{{ durText }} min</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:11px;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px;"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+            <span style="font-size:14px; font-weight:600; color:#46505c; line-height:1.45;">{{ summaryWhen }}</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:11px;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none; margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+            <span style="font-size:14px; font-weight:600; color:#46505c; line-height:1.45;">{{ tzLabel }}</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="flex:1;"></div>
+    </div>
+
+    <!-- ===================== RIGHT PANEL ===================== -->
+    <div style="flex:1; min-width:0; padding:30px 32px; display:flex; flex-direction:column;">
+
+      <!-- ---------- SELECT: calendar + times ---------- -->
+      <sc-if value="{{ isSelect }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px;">
+          <div style="font-size:21px; font-weight:700; color:#15233a; letter-spacing:-0.01em;">Select a Date &amp; Time</div>
+          <div style="position:relative;">
+            <button onClick="{{ toggleTz }}" style="{{ tzTriggerStyle }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5a6573" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+              <span style="font-size:13px; font-weight:600; color:#15233a; white-space:nowrap;">{{ tzLabel }}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="{{ tzChevStyle }}"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <sc-if value="{{ tzOpen }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ closeTz }}" style="position:fixed; inset:0; z-index:40;"></div>
+              <div style="position:absolute; top:46px; right:0; width:272px; max-height:296px; overflow-y:auto; background:#fff; border:1px solid #e4e8ed; border-radius:12px; box-shadow:0 14px 38px rgba(20,40,80,.18); z-index:50; padding:6px;">
+                <div style="font-size:11px; color:#9aa3ad; padding:6px 11px 6px; letter-spacing:.02em;">{{ tzNow }}</div>
+                <sc-for list="{{ tzOptions }}" as="o" hint-placeholder-count="6">
+                  <button onClick="{{ o.onSelect }}" style="{{ o.rowStyle }}">
+                    <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ o.label }}</span>
+                    <sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a45c0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 6L9 17l-5-5"/></svg></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:30px; flex:1; min-height:0;">
+
+          <!-- calendar -->
+          <div style="width:352px; flex:none;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+              <div style="font-size:16px; font-weight:600; color:#15233a;">{{ monthLabel }}</div>
+              <div style="display:flex; gap:4px;">
+                <button onClick="{{ prevMonth }}" disabled="{{ prevDisabled }}" style="{{ prevStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+                <button onClick="{{ nextMonth }}" style="{{ navStyle }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:6px;">
+              <sc-for list="{{ dows }}" as="w" hint-placeholder-count="7">
+                <div style="text-align:center; font-size:11px; font-weight:600; letter-spacing:.04em; color:#9aa3ad; padding:6px 0;">{{ w }}</div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px;">
+              <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+                <div style="aspect-ratio:1; display:flex; align-items:center; justify-content:center;">
+                  <button onClick="{{ c.onClick }}" disabled="{{ c.disabled }}" data-cal="{{ c.role }}" style="{{ c.style }}">{{ c.label }}</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- times -->
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+            <sc-if value="{{ hasDate }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:15px; font-weight:600; color:#15233a; margin-bottom:4px;">{{ selectedDateFull }}</div>
+              <div style="font-size:12.5px; color:#9aa3ad; margin-bottom:14px;">{{ slotCountLabel }}</div>
+              <div class="col" style="flex:1; min-height:0; overflow-y:auto; padding-right:6px; display:flex; flex-direction:column; gap:9px;">
+                <sc-for list="{{ times }}" as="t" hint-placeholder-count="8">
+                  <div style="display:flex; gap:8px;">
+                    <button onClick="{{ t.onClick }}" data-slot="{{ t.role }}" style="{{ t.style }}">{{ t.label }}</button>
+                    <sc-if value="{{ t.selected }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ next }}" data-next="1" style="{{ nextBtnStyle }}">Next</button>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noDate }}" hint-placeholder-val="{{ true }}">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#aab3bd;">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cdd5dd" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>
+                <div style="font-size:13.5px; margin-top:12px; max-width:170px; line-height:1.5;">Pick a day to see open times</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+      </sc-if>
+
+      <!-- ---------- DETAILS: form ---------- -->
+      <sc-if value="{{ isDetails }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:21px; font-weight:700; color:#15233a; letter-spacing:-0.01em; margin-bottom:22px;">Enter Details</div>
+        <div style="display:flex; flex-direction:column; gap:18px; max-width:440px;">
+          <label style="display:flex; flex-direction:column; gap:7px;">
+            <span style="font-size:13px; font-weight:600; color:#46505c;">Name <span style="color:#d04646;">*</span></span>
+            <input value="{{ name }}" onChange="{{ setName }}" placeholder="Sam Rivera" style="border:1.5px solid #d4dae1; border-radius:9px; font-size:14.5px; color:#15233a; padding:12px 13px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:7px;">
+            <span style="font-size:13px; font-weight:600; color:#46505c;">Email <span style="color:#d04646;">*</span></span>
+            <input value="{{ email }}" onChange="{{ setEmail }}" placeholder="sam@company.com" inputmode="email" style="border:1.5px solid #d4dae1; border-radius:9px; font-size:14.5px; color:#15233a; padding:12px 13px;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:7px;">
+            <span style="font-size:13px; font-weight:600; color:#46505c;">Please share anything that will help prepare for our meeting</span>
+            <textarea value="{{ note }}" onChange="{{ setNote }}" rows="3" placeholder="What would you like to cover?" style="border:1.5px solid #d4dae1; border-radius:9px; font-size:14.5px; color:#15233a; padding:12px 13px; line-height:1.5;"></textarea>
+          </label>
+          <div style="font-size:12px; color:#9aa3ad; line-height:1.5;">By proceeding, you confirm a calendar invite with a Google Meet link will be sent to your email.</div>
+          <button onClick="{{ schedule }}" disabled="{{ cantSchedule }}" style="{{ scheduleStyle }}">Schedule Event</button>
+        </div>
+      </sc-if>
+
+      <!-- ---------- DONE: confirmation ---------- -->
+      <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; max-width:460px; margin:0 auto;">
+          <div style="width:62px; height:62px; border-radius:50%; background:#eafaf0; border:1px solid #c9efd8; display:flex; align-items:center; justify-content:center; margin-bottom:20px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#22a35c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div style="font-size:24px; font-weight:700; color:#15233a; letter-spacing:-0.01em;">You are scheduled</div>
+          <div style="font-size:14px; color:#5a6573; margin:9px 0 24px;">A calendar invitation has been sent to <strong style="color:#15233a; font-weight:600;">{{ email }}</strong>.</div>
+          <div style="width:100%; text-align:left; border:1px solid #e6eaef; border-radius:13px; overflow:hidden;">
+            <div style="padding:15px 18px; border-bottom:1px solid #eef1f4; font-size:16px; font-weight:700; color:#15233a;">{{ meetingTitle }}</div>
+            <div style="display:flex; align-items:center; gap:11px; padding:13px 18px; border-bottom:1px solid #f0f2f5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span style="font-size:14px; color:#46505c; font-weight:500;">{{ summaryWhen }}</span></div>
+            <div style="display:flex; align-items:center; gap:11px; padding:13px 18px; border-bottom:1px solid #f0f2f5;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span style="font-size:14px; color:#46505c; font-weight:500;">{{ tzLabel }}</span></div>
+            <div style="display:flex; align-items:center; gap:11px; padding:13px 18px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7a8794" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10l4.55-2.6A1 1 0 0 1 21 8.27v7.46a1 1 0 0 1-1.45.87L15 14M4 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></svg><span style="font-size:14px; color:#46505c; font-weight:500;">Google Meet</span></div>
+          </div>
+          <div style="display:flex; gap:11px; margin-top:22px;">
+            <button onClick="{{ ics }}" style="font-size:14px; font-weight:600; color:#fff; background:#1a45c0; border:none; border-radius:10px; padding:12px 22px; cursor:pointer;">Add to calendar</button>
+            <button onClick="{{ reset }}" style="font-size:14px; font-weight:500; color:#5a6573; background:#fff; border:1px solid #d4dae1; border-radius:10px; padding:12px 20px; cursor:pointer;">Schedule another</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100,&quot;height&quot;:740},&quot;hostTimezone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;America/Los_Angeles&quot;,&quot;options&quot;:[&quot;America/Los_Angeles&quot;,&quot;America/Denver&quot;,&quot;America/Chicago&quot;,&quot;America/New_York&quot;,&quot;Europe/London&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;allowWeekends&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.HOST_TZ = props.hostTimezone || 'America/Los_Angeles';
+    let detected = 'America/New_York';
+    try { detected = Intl.DateTimeFormat().resolvedOptions().timeZone || detected; } catch(e){}
+    this.tzOptions = this.buildTzOptions(detected);
+    this.durOpts = [
+      { k:15, title:'15 minutes', blurb:'Quick sync', color:'#6495ED', tint:'#eef3fd' },
+      { k:30, title:'30 minutes', blurb:'Standard', color:'#9C4DC8', tint:'#f5edfa' },
+      { k:60, title:'60 minutes', blurb:'Deep dive', color:'#386641', tint:'#e8efea' },
+      { k:'custom', title:'Custom length', blurb:'Your call', color:'#B0623C', tint:'#f7eee8' }
+    ];
+    this.dowNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const now = new Date();
+    this.state = {
+      step:'select', duration:30, customMins:'',
+      viewYear:now.getFullYear(), viewMonth:now.getMonth(),
+      selDate:null, selTime:null, tz:detected, tzOpen:false,
+      name:'', email:'', note:''
+    };
+    this.rootRef = React.createRef();
+  }
+
+  componentDidMount(){ this.applyAccent(); }
+  componentDidUpdate(){ this.applyAccent(); }
+  applyAccent(){
+    if (!this.styleEl){ this.styleEl = document.createElement('style'); document.head.appendChild(this.styleEl); }
+    const o = this.durOpts.find(x => String(x.k) === String(this.state.duration)) || this.durOpts[1];
+    const ca = o.color, ct = o.tint, caa = this.hexA(o.color,.2), cab = this.hexA(o.color,.35);
+    const S = '[data-screen-label="Scheduling page"] ';
+    const cur = String(this.state.duration);
+    this.styleEl.textContent =
+      S + '[data-cal="avail"]{background:' + ct + '!important;color:' + ca + '!important;box-shadow:none!important;}' +
+      S + '[data-cal="sel"]{background:' + ca + '!important;color:#fff!important;box-shadow:0 0 0 3px ' + caa + '!important;}' +
+      S + '[data-slot="open"]{background:#fff!important;color:' + ca + '!important;border-color:' + cab + '!important;}' +
+      S + '[data-slot="sel"]{background:' + ca + '!important;color:#fff!important;border-color:' + ca + '!important;}' +
+      S + '[data-next]{background:' + ca + '!important;}' +
+      S + '[data-dur]{border-color:#e4e8ed!important;background:#fff!important;}' +
+      S + '[data-dur="' + cur + '"]{border-color:' + ca + '!important;background:' + ct + '!important;}';
+  }
+  componentWillUnmount(){ if (this.styleEl && this.styleEl.parentNode) this.styleEl.parentNode.removeChild(this.styleEl); }
+
+  /* =================== GOOGLE CALENDAR HOOKS — wire up later ===================
+     Availability here is simulated in HOST_TZ. To make it real:
+     connectGoogle():    launch Google Identity Services OAuth. Scopes:
+                           https://www.googleapis.com/auth/calendar.events     (write)
+                           https://www.googleapis.com/auth/calendar.readonly   (free/busy)
+     fetchBusy(rangeStart,rangeEnd): gapi.client.calendar.freebusy.query(...) -> busy[]
+                           then have slotsFor() subtract those ranges instead of the
+                           seeded isTaken() stub below.
+     createEvent(s):      events.insert({ calendarId:'primary', resource:{ summary,
+                           start:{dateTime,timeZone}, end:{...}, attendees:[{email}],
+                           conferenceData:{ createRequest:{...Meet...} } } }).
+     Times are stored as absolute instants (ms) so timezone display is already correct.
+     ========================================================================== */
+  connectGoogle(){ /* TODO: OAuth consent */ }
+  async fetchBusy(){ /* TODO: freebusy.query */ return []; }
+  async createEvent(s){ /* TODO: events.insert with attendee + Meet link */ }
+
+  // ---- timezone helpers ----
+  buildTzOptions(detected){
+    const base = [
+      { tz:'America/Los_Angeles', label:'Pacific Time — US & Canada' },
+      { tz:'America/Denver', label:'Mountain Time — US & Canada' },
+      { tz:'America/Chicago', label:'Central Time — US & Canada' },
+      { tz:'America/New_York', label:'Eastern Time — US & Canada' },
+      { tz:'America/Sao_Paulo', label:'São Paulo' },
+      { tz:'Europe/London', label:'London — GMT/BST' },
+      { tz:'Europe/Paris', label:'Central European Time' },
+      { tz:'Asia/Kolkata', label:'India Standard Time' },
+      { tz:'Asia/Singapore', label:'Singapore Time' },
+      { tz:'Asia/Tokyo', label:'Japan Standard Time' },
+      { tz:'Australia/Sydney', label:'Sydney — AEST/AEDT' }
+    ];
+    if (!base.some(o => o.tz === detected)) {
+      base.unshift({ tz:detected, label:detected.split('/').pop().replace(/_/g,' ') + ' (your time zone)' });
+    }
+    return base;
+  }
+  tzLabelFor(tz){
+    const o = this.tzOptions.find(x => x.tz === tz);
+    return o ? o.label : tz.replace(/_/g,' ');
+  }
+  offsetMin(date, tz){
+    const dtf = new Intl.DateTimeFormat('en-US',{ timeZone:tz, hour12:false, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    const p = {}; dtf.formatToParts(date).forEach(x => p[x.type] = x.value);
+    let h = parseInt(p.hour,10); if (h === 24) h = 0;
+    const asUTC = Date.UTC(+p.year, +p.month-1, +p.day, h, +p.minute, +p.second);
+    return Math.round((asUTC - date.getTime()) / 60000);
+  }
+  // absolute instant (ms) for a wall-clock time in HOST_TZ
+  instantFromHostWall(y, m, d, hh, mm){
+    let guess = Date.UTC(y, m, d, hh, mm);
+    let inst = guess - this.offsetMin(new Date(guess), this.HOST_TZ) * 60000;
+    inst = guess - this.offsetMin(new Date(inst), this.HOST_TZ) * 60000;
+    return inst;
+  }
+  fmtTime(inst, tz){
+    let s = new Intl.DateTimeFormat('en-US',{ timeZone:tz, hour:'numeric', minute:'2-digit', hour12:true }).format(new Date(inst));
+    return s.replace(/\s?([AP])M/i, (m,g) => g.toLowerCase() + 'm');
+  }
+  fmtDateFull(date){
+    return new Intl.DateTimeFormat('en-US',{ weekday:'long', month:'long', day:'numeric' }).format(date);
+  }
+
+  durMins(){ const s = this.state; return s.duration === 'custom' ? (parseInt(s.customMins) || 0) : (s.duration || 0); }
+
+  isDayAvailable(date){
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (date < today) return false;
+    const dow = date.getDay();
+    const weekends = this.props.allowWeekends ?? false;
+    if (!weekends && (dow === 0 || dow === 6)) return false;
+    return true;
+  }
+  isTaken(date, idx){ return ((date.getDate() * 7 + idx * 3) % 5) === 0; }
+
+  slotsFor(date){
+    if (!date) return [];
+    const dur = this.durMins() || 30;
+    const y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
+    const startMin = 9 * 60, endMin = 17 * 60; // host working hours, HOST_TZ
+    const out = [];
+    let idx = 0;
+    for (let t = startMin; t + dur <= endMin; t += 30, idx++){
+      if (this.isTaken(date, idx)) continue;
+      const inst = this.instantFromHostWall(y, m, d, Math.floor(t/60), t % 60);
+      out.push({ inst, label:this.fmtTime(inst, this.state.tz) });
+    }
+    return out;
+  }
+
+  // ---- nav / actions ----
+  setStep(step){ this.setState({ step }); }
+  pickDur(k){ this.setState({ duration:k, selTime:null }); }
+  pickDate(date){ this.setState({ selDate:date, selTime:null }); }
+  pickTime(t){ this.setState({ selTime:t }); }
+  toggleTz(){ this.setState(s => ({ tzOpen: !s.tzOpen })); }
+  closeTz(){ this.setState({ tzOpen:false }); }
+  selectTz(tz){ this.setState({ tz, tzOpen:false }); }
+  tzRowStyle(sel){ return { display:'flex', alignItems:'center', justifyContent:'space-between', gap:'10px', width:'100%', textAlign:'left', padding:'9px 11px', border:'none', borderRadius:'8px', background:sel?'#f1f4fa':'transparent', cursor:'pointer', fontSize:'13px', fontWeight:sel?600:500, color:'#15233a' }; }
+  prevMonth(){ this.setState(s => { let m = s.viewMonth-1, y = s.viewYear; if (m<0){ m=11; y--; } return { viewMonth:m, viewYear:y }; }); }
+  nextMonth(){ this.setState(s => { let m = s.viewMonth+1, y = s.viewYear; if (m>11){ m=0; y++; } return { viewMonth:m, viewYear:y }; }); }
+  back(){ const s = this.state; if (s.step === 'details') this.setStep('select'); }
+  schedule(){ const s = this.state; if (s.name.trim() && /.+@.+\..+/.test(s.email)){ this.createEvent(s); this.setStep('done'); } }
+  reset(){ const now = new Date(); this.setState({ step:'select', duration:30, customMins:'', selDate:null, selTime:null, name:'', email:'', note:'', viewYear:now.getFullYear(), viewMonth:now.getMonth() }); }
+
+  ics(){
+    const s = this.state; if (!s.selTime) return;
+    const dur = this.durMins() || 30;
+    const start = new Date(s.selTime.inst), end = new Date(s.selTime.inst + dur*60000);
+    const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
+    const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Jarod McCloskey//Scheduler//EN','BEGIN:VEVENT',
+      'UID:'+Date.now()+'@jarod-scheduler','DTSTAMP:'+fmt(new Date()),'DTSTART:'+fmt(start),'DTEND:'+fmt(end),
+      'SUMMARY:'+dur+' Minute Meeting with Jarod McCloskey','LOCATION:Google Meet',
+      'DESCRIPTION:'+(s.note ? s.note.replace(/\n/g,' ') : 'Booked via Jarod\u2019s scheduling page'),
+      'ATTENDEE;CN='+(s.name||'Guest')+':mailto:'+(s.email||''),'END:VEVENT','END:VCALENDAR'];
+    const blob = new Blob([lines.join('\r\n')], { type:'text/calendar' });
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'meeting-with-jarod.ics'; document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ---- styles ----
+  durStyle(sel){ return { display:'flex', alignItems:'center', gap:'11px', width:'100%', padding:'11px 13px', borderRadius:'10px', border:'1.5px solid #e4e8ed', background:'#fff', cursor:'pointer', color:'#15233a', transition:'all .13s' }; } // border/bg via injected stylesheet (data-dur)
+  radioStyle(c){ return { width:'18px', height:'18px', borderRadius:'50%', border:'2px solid '+c.color, display:'flex', alignItems:'center', justifyContent:'center', flex:'none' }; }
+  dotStyle(sel, c){ return { width:'8px', height:'8px', borderRadius:'50%', background:sel?c.color:'transparent' }; }
+  navStyle(disabled){ return { width:'32px', height:'32px', borderRadius:'8px', border:'none', background:'transparent', cursor:disabled?'default':'pointer', color:disabled?'#cfd6de':'#46505c', display:'flex', alignItems:'center', justifyContent:'center' }; }
+  hexA(hex, a){ const h = hex.replace('#',''); const n = parseInt(h,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+  activeColor(){ const s = this.state; const o = this.durOpts.find(x => x.k === s.duration) || this.durOpts[1]; return { accent:o.color, tint:o.tint }; }
+  cellStyle(state){
+    const b = { width:'38px', height:'38px', borderRadius:'50%', border:'none', background:'transparent', cursor:'pointer', fontSize:'14px', fontWeight:600, transition:'all .12s', display:'flex', alignItems:'center', justifyContent:'center', padding:0 };
+    if (state === 'empty') return { ...b, visibility:'hidden' };
+    if (state === 'disabled') return { ...b, color:'#c2cad3', cursor:'default', fontWeight:400 };
+    return b; // available & selected colored via injected stylesheet (data-cal)
+  }
+  timeStyle(sel){
+    const b = { padding:'13px 4px', borderRadius:'10px', border:'1.5px solid #e4e8ed', background:'#fff', fontSize:'14.5px', fontWeight:600, textAlign:'center', cursor:sel?'default':'pointer', transition:'all .12s' };
+    return sel ? { ...b, flex:1 } : { ...b, width:'100%' }; // color via injected stylesheet (data-slot)
+  }
+
+  buildCells(){
+    const { viewYear:y, viewMonth:m, selDate, duration:dur } = this.state;
+    const first = new Date(y, m, 1).getDay();
+    const dim = new Date(y, m+1, 0).getDate();
+    const cells = [];
+    for (let i=0; i<first; i++) cells.push({ key:'e'+i+'-'+dur, label:'', role:'empty', disabled:true, style:this.cellStyle('empty') });
+    for (let d=1; d<=dim; d++){
+      const date = new Date(y, m, d);
+      const avail = this.isDayAvailable(date);
+      const sel = selDate && selDate.getFullYear()===y && selDate.getMonth()===m && selDate.getDate()===d;
+      const state = sel ? 'selected' : (avail ? 'available' : 'disabled');
+      const role = sel ? 'sel' : (avail ? 'avail' : 'disabled');
+      cells.push({ key:'d'+d+'-'+dur, label:String(d), role, disabled:!avail, style:this.cellStyle(state), onClick: avail ? () => this.pickDate(date) : null });
+    }
+    while (cells.length % 7 !== 0) cells.push({ key:'t'+cells.length+'-'+dur, label:'', role:'empty', disabled:true, style:this.cellStyle('empty') });
+    return cells;
+  }
+
+  renderVals(){
+    const s = this.state;
+    const dur = this.durMins();
+    const title = (s.duration === 'custom' ? (dur || 'Custom') : dur) + ' Minute Meeting';
+    const slots = s.step === 'select' ? this.slotsFor(s.selDate) : [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const prevDisabled = (s.viewYear < today.getFullYear()) || (s.viewYear === today.getFullYear() && s.viewMonth <= today.getMonth());
+
+    let summaryWhen = '';
+    if (s.selTime){
+      const endInst = s.selTime.inst + (dur||30)*60000;
+      summaryWhen = this.fmtTime(s.selTime.inst, s.tz) + ' – ' + this.fmtTime(endInst, s.tz) + ', ' + this.fmtDateFull(new Date(s.selTime.inst));
+    }
+    const tzNow = (() => { try { return 'Now ' + this.fmtTime(Date.now(), s.tz); } catch(e){ return ''; } })();
+
+    return {
+      meetingTitle: title, rootRef: this.rootRef,
+      isSelect: s.step==='select', isDetails: s.step==='details', isDone: s.step==='done',
+      showBack: s.step==='details', showSummary: s.step==='details' || s.step==='done',
+      isCustom: s.duration==='custom', customMins: s.customMins,
+      setCustom: e => this.setState({ customMins:e.target.value.replace(/[^0-9]/g,''), selTime:null }),
+      durText: dur || '', durations: this.durOpts.map(o => { const sel = String(o.k)===String(s.duration); return { ...o, key:'dur'+o.k+'-'+s.duration, selected:sel, style:this.durStyle(sel), radio:this.radioStyle(o), dot:this.dotStyle(sel,o), onClick:() => this.pickDur(o.k) }; }),
+
+      monthLabel: new Intl.DateTimeFormat('en-US',{ month:'long', year:'numeric' }).format(new Date(s.viewYear, s.viewMonth, 1)),
+      prevMonth: () => this.prevMonth(), nextMonth: () => this.nextMonth(),
+      prevDisabled, prevStyle: this.navStyle(prevDisabled), navStyle: this.navStyle(false),
+      dows: this.dowNames, cells: this.buildCells(),
+
+      hasDate: !!s.selDate, noDate: !s.selDate,
+      selectedDateFull: s.selDate ? this.fmtDateFull(s.selDate) : '',
+      slotCountLabel: s.selDate ? (slots.length ? slots.length + ' open time' + (slots.length===1?'':'s') : 'No open times — try another day') : '',
+      times: slots.map(t => { const sel = !!(s.selTime && s.selTime.inst===t.inst); return { ...t, key:'tm'+t.inst+'-'+s.duration, selected:sel, role: sel ? 'sel' : 'open', style:this.timeStyle(sel), onClick:() => this.pickTime(t) }; }),
+      next: () => this.setStep('details'),
+      nextBtnStyle: { flex:1, fontSize:'15px', fontWeight:600, color:'#fff', background:'#2456c4', border:'none', borderRadius:'10px', cursor:'pointer', transition:'background .12s' },
+
+      tz: s.tz, tzLabel: this.tzLabelFor(s.tz), tzNow, tzOpen: s.tzOpen,
+      toggleTz: () => this.toggleTz(), closeTz: () => this.closeTz(),
+      tzTriggerStyle: { display:'flex', alignItems:'center', gap:'8px', background:'#f4f6f9', border:'1px solid '+(s.tzOpen?'#c5ced9':'#e4e8ed'), borderRadius:'10px', padding:'9px 12px', cursor:'pointer', transition:'border-color .12s' },
+      tzChevStyle: { transition:'transform .15s', transform:s.tzOpen?'rotate(180deg)':'rotate(0deg)' },
+      tzOptions: this.tzOptions.map(o => ({ ...o, selected:o.tz===s.tz, onSelect:() => this.selectTz(o.tz), rowStyle:this.tzRowStyle(o.tz===s.tz) })),
+
+      name: s.name, email: s.email, note: s.note,
+      setName: e => this.setState({ name:e.target.value }),
+      setEmail: e => this.setState({ email:e.target.value }),
+      setNote: e => this.setState({ note:e.target.value }),
+      cantSchedule: !(s.name.trim() && /.+@.+\..+/.test(s.email)),
+      scheduleStyle: { marginTop:'4px', fontSize:'15px', fontWeight:600, color:'#fff', background:(s.name.trim() && /.+@.+\..+/.test(s.email)) ? '#1a45c0' : '#aab8e0', border:'none', borderRadius:'10px', padding:'13px', cursor:(s.name.trim() && /.+@.+\..+/.test(s.email)) ? 'pointer':'not-allowed', transition:'background .15s' },
+      schedule: () => this.schedule(),
+
+      summaryWhen, back: () => this.back(), reset: () => this.reset(), ics: () => this.ics()
+    };
+  }
+}
+</script>
+</body>
+</html>

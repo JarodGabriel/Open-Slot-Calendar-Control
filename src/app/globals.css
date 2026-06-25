@@ -1,0 +1,44 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: "Public Sans", -apple-system, "Segoe UI", sans-serif;
+}
+
+input,
+textarea,
+button,
+select {
+  font-family: inherit;
+  outline: none;
+}
+
+textarea {
+  resize: none;
+}
+
+::placeholder {
+  color: #9aa3ad;
+  opacity: 1;
+}
+
+/* Scrollable time-slot column */
+.scroll-col::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-col::-webkit-scrollbar-thumb {
+  background: #dfe3e8;
+  border-radius: 4px;
+}
+.scroll-col::-webkit-scrollbar-track {
+  background: transparent;
+}
