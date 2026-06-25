@@ -23,6 +23,9 @@ buttons all recolor to match.
   your Google account and your server.
 - **Free forever** — MIT licensed, no SaaS subscription.
 - **Yours to brand** — your name, your tagline, your domain, your working hours.
+- **Responsive on any device** — one fluid layout that adapts from desktop to phone. On
+  narrow screens the rail, calendar, and time slots stack vertically so nothing overflows
+  or gets cut off — no separate mobile build, no app to install.
 - **Real calendar sync** — server-side Google free/busy + event creation with a Meet
   link and an emailed invite. OAuth secrets stay on the server, never in the browser.
 - **Conflict-aware across all your calendars** — check free/busy across as many calendars
