@@ -186,6 +186,26 @@ export default function Scheduler() {
     URL.revokeObjectURL(url);
   };
 
+  // Pre-filled "Add to Google Calendar" template URL — opens the guest's
+  // calendar with the event ready to save, instead of downloading a file.
+  const googleCalendarUrl = () => {
+    if (!selTime) return "#";
+    const start = new Date(selTime.inst);
+    const end = new Date(selTime.inst + (durMins || 30) * 60000);
+    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const details = [meetingUrl ? `Google Meet: ${meetingUrl}` : "", note]
+      .filter(Boolean)
+      .join("\n\n");
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: `${durMins || 30} Minute Meeting with ${config.hostName}`,
+      dates: `${fmt(start)}/${fmt(end)}`,
+      location: meetingUrl || "Google Meet",
+    });
+    if (details) params.set("details", details);
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
   // ---- derived display ----------------------------------------------------
   const monthLabel = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(
     new Date(viewYear, viewMonth, 1),
@@ -952,38 +972,68 @@ export default function Scheduler() {
                   )}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 11, marginTop: 22 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 12,
+                  marginTop: 22,
+                }}
+              >
+                <div style={{ display: "flex", gap: 11 }}>
+                  <a
+                    href={googleCalendarUrl()}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: "#fff",
+                      background: "#1a45c0",
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "12px 22px",
+                      cursor: "pointer",
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    Add to calendar
+                  </a>
+                  <button
+                    type="button"
+                    onClick={reset}
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: "#5a6573",
+                      background: "#fff",
+                      border: "1px solid #d4dae1",
+                      borderRadius: 10,
+                      padding: "12px 20px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Schedule another
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={downloadIcs}
                   style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: "#fff",
-                    background: "#1a45c0",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "12px 22px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Add to calendar
-                </button>
-                <button
-                  type="button"
-                  onClick={reset}
-                  style={{
-                    fontSize: 14,
+                    fontSize: 12.5,
                     fontWeight: 500,
-                    color: "#5a6573",
-                    background: "#fff",
-                    border: "1px solid #d4dae1",
-                    borderRadius: 10,
-                    padding: "12px 20px",
+                    color: "#9aa3ad",
+                    background: "none",
+                    border: "none",
                     cursor: "pointer",
+                    textDecoration: "underline",
+                    padding: 0,
                   }}
                 >
-                  Schedule another
+                  Use Outlook or Apple Calendar? Download .ics
                 </button>
               </div>
             </div>
