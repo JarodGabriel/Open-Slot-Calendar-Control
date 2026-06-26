@@ -1134,8 +1134,9 @@ export default function Scheduler({
                   </div>
                 )}
                 <div style={{ fontSize: 12, color: "#9aa3ad", lineHeight: 1.5 }}>
-                  By proceeding, you confirm a calendar invite with a {meetingLabel} link will be sent
-                  to your email.
+                  {effectiveMeetingType === "phone"
+                    ? "By proceeding, you confirm a calendar invite will be sent to your email."
+                    : `By proceeding, you confirm a calendar invite with a ${meetingLabel} link will be sent to your email.`}
                 </div>
                 {bookError && (
                   <div style={{ fontSize: 13, color: "#d04646", fontWeight: 500 }}>{bookError}</div>
