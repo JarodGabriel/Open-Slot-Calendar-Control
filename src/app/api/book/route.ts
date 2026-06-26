@@ -60,6 +60,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Zoom isn’t configured for this host." }, { status: 400 });
     }
     conferencing = { type: "zoom", url: config.zoomUrl };
+  } else if (meetingType === "phone") {
+    conferencing = { type: "none" };
   } else {
     conferencing = { type: "meet" };
   }
@@ -82,6 +84,7 @@ export async function POST(req: NextRequest) {
   const cancelUrl = `${origin}/cancel/${token}`;
 
   const description = [
+    config.bookingNote.trim(),
     note.trim(),
     "Need to make changes to this meeting?",
     `Reschedule: ${rescheduleUrl}`,

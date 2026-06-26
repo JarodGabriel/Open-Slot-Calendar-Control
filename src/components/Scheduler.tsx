@@ -95,7 +95,7 @@ export default function Scheduler({
       : "custom"
     : hasEventTypes
       ? eventTypes[0].durations[0]
-      : DEFAULT_DURATION;
+      : (config.allowedDurations?.[0] ?? DEFAULT_DURATION);
 
   const [eventTypeKey, setEventTypeKey] = useState(eventTypes[0]?.key ?? "");
   const [step, setStep] = useState<Step>("select");
@@ -120,7 +120,9 @@ export default function Scheduler({
     : undefined;
   const availableDurations = activeEventType
     ? DURATIONS.filter((d) => activeEventType.durations.includes(d.k))
-    : DURATIONS;
+    : config.allowedDurations
+      ? DURATIONS.filter((d) => config.allowedDurations!.includes(d.k))
+      : DURATIONS;
   const effectiveMeetingType: MeetingType = activeEventType ? activeEventType.conferencing : meetingType;
   const meetingLabel = MEETING_LABELS[effectiveMeetingType];
 
@@ -573,6 +575,24 @@ export default function Scheduler({
           >
             {meetingTitle}
           </h1>
+
+          {config.bookingNote && (
+            <div
+              style={{
+                marginTop: 16,
+                padding: "12px 14px",
+                background: "#f4f6f9",
+                border: "1px solid #e7ebf0",
+                borderRadius: 10,
+                fontSize: 12.5,
+                color: "#46505c",
+                lineHeight: 1.55,
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {config.bookingNote}
+            </div>
+          )}
 
           {step === "select" && isReschedule && (
             <div style={{ fontSize: 13.5, color: "#7a8794", marginTop: 16, lineHeight: 1.5 }}>

@@ -21,12 +21,14 @@ function list(v: string | undefined): string[] {
 const calendarId = process.env.HOST_CALENDAR_ID || "primary";
 
 // Conferencing options offered at booking. Comma-separated, first is default.
-// "meet" auto-generates a Google Meet link; "zoom" uses ZOOM_MEETING_URL.
-const ALL_MEETING_TYPES = ["meet", "zoom"] as const;
+// "meet" auto-generates a Google Meet link; "zoom" uses ZOOM_MEETING_URL;
+// "phone" attaches no video link (e.g. a phone call — put the number in the note).
+const ALL_MEETING_TYPES = ["meet", "zoom", "phone"] as const;
 export type MeetingType = (typeof ALL_MEETING_TYPES)[number];
 export const MEETING_LABELS: Record<MeetingType, string> = {
   meet: "Google Meet",
   zoom: "Zoom",
+  phone: "Phone call",
 };
 const requestedTypes = list(process.env.NEXT_PUBLIC_MEETING_OPTIONS).filter(
   (t): t is MeetingType => (ALL_MEETING_TYPES as readonly string[]).includes(t),
@@ -45,6 +47,19 @@ export interface EventType {
   conferencing: MeetingType;
 }
 
+// Restrict which lengths a page offers (e.g. "15" for a 15-min-only page).
+// Comma-separated; values 15/30/60/custom. Empty = all four.
+function parseDurations(): DurationKey[] | null {
+  const items = list(process.env.NEXT_PUBLIC_DURATIONS);
+  if (!items.length) return null;
+  const out: DurationKey[] = [];
+  for (const it of items) {
+    if (it === "custom") out.push("custom");
+    else if (["15", "30", "60"].includes(it)) out.push(Number(it) as DurationKey);
+  }
+  return out.length ? out : null;
+}
+
 function parseEventTypes(): EventType[] {
   const raw = process.env.NEXT_PUBLIC_EVENT_TYPES;
   if (!raw) return [];
@@ -59,7 +74,7 @@ function parseEventTypes(): EventType[] {
           typeof e.label === "string" &&
           Array.isArray(e.durations) &&
           e.durations.length > 0 &&
-          (e.conferencing === "meet" || e.conferencing === "zoom"),
+          (ALL_MEETING_TYPES as readonly string[]).includes(e.conferencing),
       )
       .map((e) => ({
         key: e.key as string,
@@ -98,4 +113,8 @@ export const config = {
   zoomUrl: process.env.ZOOM_MEETING_URL || "",
   // Event types (Student / Professional, etc.). Empty = no event-type layer.
   eventTypes: parseEventTypes(),
+  // Restrict the offered lengths (null = all four).
+  allowedDurations: parseDurations(),
+  // A custom message shown on the booking page (e.g. call instructions).
+  bookingNote: process.env.NEXT_PUBLIC_BOOKING_NOTE || "",
 } as const;
