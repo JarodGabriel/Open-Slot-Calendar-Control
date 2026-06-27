@@ -54,8 +54,8 @@ buttons all recolor to match.
 Requires **Node 18.18+** (Node 20+ recommended).
 
 ```bash
-git clone https://github.com/<your-username>/OpenSlot.git
-cd OpenSlot
+git clone https://github.com/JarodGabriel/Open-Slot-Calendar-Control.git
+cd Open-Slot-Calendar-Control
 npm install
 
 # copy the env template (macOS/Linux)
