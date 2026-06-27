@@ -118,6 +118,7 @@ export const config = {
   eventTypes: parseEventTypes(),
   // Restrict the offered lengths (null = all four).
   allowedDurations: parseDurations(),
-  // A custom message shown on the booking page (e.g. call instructions).
-  bookingNote: process.env.NEXT_PUBLIC_BOOKING_NOTE || "",
+  // A custom message shown on the booking page (e.g. call instructions). Use a
+  // literal "\n" for a line break and "\n\n" for a blank line between paragraphs.
+  bookingNote: (process.env.NEXT_PUBLIC_BOOKING_NOTE || "").replace(/\\n/g, "\n"),
 } as const;
