@@ -99,6 +99,9 @@ export const config = {
   hostTz: process.env.HOST_TIMEZONE || "America/Los_Angeles",
   workStartHour: num(process.env.WORK_START_HOUR, 9),
   workEndHour: num(process.env.WORK_END_HOUR, 17),
+  // Minimum lead time in whole calendar days (host tz). 0 = same-day allowed;
+  // 1 = no same-day bookings, earliest is tomorrow.
+  minNoticeDays: Math.max(0, num(process.env.MIN_NOTICE_DAYS, 0)),
 
   // The calendar new bookings are CREATED on.
   calendarId,

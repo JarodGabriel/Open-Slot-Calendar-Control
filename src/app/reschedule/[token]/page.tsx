@@ -16,6 +16,7 @@ export default async function ReschedulePage({ params }: { params: Promise<{ tok
         workStartHour: config.workStartHour,
         workEndHour: config.workEndHour,
         allowWeekends: config.allowWeekends,
+        minNoticeDays: config.minNoticeDays,
       }}
       reschedule={{ token, durationMin }}
     />

@@ -64,3 +64,24 @@ export function fmtDateFull(date: Date, tz?: string): string {
     ...(tz ? { timeZone: tz } : {}),
   }).format(date);
 }
+
+/**
+ * Earliest instant a slot may start, given a minimum lead time in whole calendar
+ * days (in the host's zone). minNoticeDays=0 → now; 1 → midnight tomorrow (host
+ * tz), so the rest of "today" is off-limits but all of the next day is open.
+ */
+export function minBookableInstant(hostTz: string, minNoticeDays: number, now: number = Date.now()): number {
+  if (minNoticeDays <= 0) return now;
+  const p: Record<string, string> = {};
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: hostTz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .formatToParts(new Date(now))
+    .forEach((x) => (p[x.type] = x.value));
+  // Midnight of (host-today + minNoticeDays); Date.UTC normalizes day overflow.
+  const floor = instantFromHostWall(+p.year, +p.month - 1, +p.day + minNoticeDays, 0, 0, hostTz);
+  return Math.max(now, floor);
+}

@@ -13,6 +13,7 @@ export default function Page() {
         workStartHour: config.workStartHour,
         workEndHour: config.workEndHour,
         allowWeekends: config.allowWeekends,
+        minNoticeDays: config.minNoticeDays,
       }}
     />
   );

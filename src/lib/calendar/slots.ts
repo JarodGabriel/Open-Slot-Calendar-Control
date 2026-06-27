@@ -12,14 +12,15 @@ export interface GenerateSlotsArgs {
   workStartHour: number;
   workEndHour: number;
   busy: BusyRange[];
-  /** Minimum lead time before a slot can be booked (ms). Defaults to now. */
-  now?: number;
+  /** Earliest instant a slot may start (ms). Defaults to now. Used to enforce
+   *  minimum-notice rules in addition to dropping past slots. */
+  minInstant?: number;
 }
 
 /** Returns open start instants (ms epoch), ascending. */
 export function generateSlots(args: GenerateSlotsArgs): number[] {
   const { dateStr, durationMin, hostTz, workStartHour, workEndHour, busy } = args;
-  const now = args.now ?? Date.now();
+  const minInstant = args.minInstant ?? Date.now();
 
   const [y, m, d] = dateStr.split("-").map(Number);
   if (!y || !m || !d || durationMin <= 0) return [];
@@ -36,7 +37,7 @@ export function generateSlots(args: GenerateSlotsArgs): number[] {
   for (let t = startMin; t + durationMin <= endMin; t += 30) {
     const inst = instantFromHostWall(y, m - 1, d, Math.floor(t / 60), t % 60, hostTz);
     const slotEnd = inst + durationMin * 60000;
-    if (inst <= now) continue; // no past / same-instant slots
+    if (inst < minInstant) continue; // past slots + minimum-notice cutoff
     const overlaps = busyMs.some((b) => inst < b.end && slotEnd > b.start);
     if (overlaps) continue;
     out.push(inst);
