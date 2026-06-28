@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/lib/config";
-import { instantFromHostWall, minBookableInstant } from "@/lib/timezone";
+import { instantFromHostWall, minBookableInstant, maxBookableInstant } from "@/lib/timezone";
 import { generateSlots } from "@/lib/calendar/slots";
 import { getProvider, isDemoMode } from "@/lib/calendar";
 
@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
       workEndHour: config.workEndHour,
       busy,
       minInstant: minBookableInstant(config.hostTz, config.minNoticeDays),
+      maxInstant: maxBookableInstant(config.hostTz, config.maxAdvanceDays),
     });
     return NextResponse.json({ slots, demo: isDemoMode() });
   } catch (err) {

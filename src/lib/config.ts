@@ -102,6 +102,9 @@ export const config = {
   // Minimum lead time in whole calendar days (host tz). 0 = same-day allowed;
   // 1 = no same-day bookings, earliest is tomorrow.
   minNoticeDays: Math.max(0, num(process.env.MIN_NOTICE_DAYS, 0)),
+  // Maximum booking horizon in whole calendar days. 0 = no limit; 21 = at most
+  // ~3 weeks of availability from today.
+  maxAdvanceDays: Math.max(0, num(process.env.MAX_ADVANCE_DAYS, 0)),
 
   // The calendar new bookings are CREATED on.
   calendarId,

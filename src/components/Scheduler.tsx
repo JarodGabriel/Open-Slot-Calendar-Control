@@ -9,7 +9,13 @@ import {
   hexAlpha,
   type DurationKey,
 } from "@/lib/durations";
-import { fmtDateFull, fmtTime, instantFromHostWall, minBookableInstant } from "@/lib/timezone";
+import {
+  fmtDateFull,
+  fmtTime,
+  instantFromHostWall,
+  minBookableInstant,
+  maxBookableInstant,
+} from "@/lib/timezone";
 import { buildTzOptions, detectTz, tzLabelFor } from "@/lib/tzOptions";
 import { buildIcs, icsFilename } from "@/lib/ics";
 import {
@@ -61,6 +67,7 @@ export interface HostSchedule {
   workEndHour: number;
   allowWeekends: boolean;
   minNoticeDays: number;
+  maxAdvanceDays: number;
 }
 
 export default function Scheduler({
@@ -78,6 +85,7 @@ export default function Scheduler({
     workEndHour: config.workEndHour,
     allowWeekends: config.allowWeekends,
     minNoticeDays: config.minNoticeDays,
+    maxAdvanceDays: config.maxAdvanceDays,
   };
   const isReschedule = !!reschedule;
   const isMobile = useIsMobile();
@@ -364,15 +372,26 @@ export default function Scheduler({
     );
   };
 
-  // A day is bookable only if it's a working day AND at least one slot start is
-  // on/after the minimum-bookable instant — so today greys out once its window
-  // closes, and earlier days grey out under a minimum-notice rule.
+  // A day is bookable only if it's a working day AND it has at least one slot
+  // inside [min, max): today greys out once its window closes, earlier days grey
+  // out under a minimum-notice rule, and days past the horizon grey out too.
   const isDayAvailable = (d: Date) => {
     const dow = d.getDay();
     if (!sched.allowWeekends && (dow === 0 || dow === 6)) return false;
     if (durMins <= 0) return false;
     const last = lastSlotStart(d);
-    return last !== null && last >= minBookableInstant(sched.hostTz, sched.minNoticeDays);
+    if (last === null) return false;
+    const min = minBookableInstant(sched.hostTz, sched.minNoticeDays);
+    const max = maxBookableInstant(sched.hostTz, sched.maxAdvanceDays);
+    const firstSlot = instantFromHostWall(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate(),
+      sched.workStartHour,
+      0,
+      sched.hostTz,
+    );
+    return last >= min && firstSlot < max;
   };
 
   // ---- styles -------------------------------------------------------------

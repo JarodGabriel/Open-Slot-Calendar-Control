@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { config } from "@/lib/config";
 import { getProvider, isDemoMode } from "@/lib/calendar";
 import { verifyBookingToken } from "@/lib/token";
-import { minBookableInstant } from "@/lib/timezone";
+import { minBookableInstant, maxBookableInstant } from "@/lib/timezone";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +22,12 @@ export async function POST(req: NextRequest) {
   if (!payload) return NextResponse.json({ error: "Invalid or expired link." }, { status: 400 });
 
   const startInst = Number(body.startInst);
-  if (!Number.isFinite(startInst) || startInst < minBookableInstant(config.hostTz, config.minNoticeDays)) {
-    return NextResponse.json({ error: "Pick a time that meets the minimum notice." }, { status: 400 });
+  if (
+    !Number.isFinite(startInst) ||
+    startInst < minBookableInstant(config.hostTz, config.minNoticeDays) ||
+    startInst >= maxBookableInstant(config.hostTz, config.maxAdvanceDays)
+  ) {
+    return NextResponse.json({ error: "Pick a time within the booking window." }, { status: 400 });
   }
 
   const startISO = new Date(startInst).toISOString();

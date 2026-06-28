@@ -9,7 +9,7 @@ import { config, MEETING_LABELS, type MeetingType } from "@/lib/config";
 import { getProvider, isDemoMode } from "@/lib/calendar";
 import type { Conferencing } from "@/lib/calendar/provider";
 import { signBookingToken } from "@/lib/token";
-import { minBookableInstant } from "@/lib/timezone";
+import { minBookableInstant, maxBookableInstant } from "@/lib/timezone";
 
 const EMAIL_RE = /.+@.+\..+/;
 
@@ -40,7 +40,11 @@ export async function POST(req: NextRequest) {
   if (!Number.isFinite(durationMin) || durationMin <= 0 || durationMin > 24 * 60) {
     return NextResponse.json({ error: "Invalid duration." }, { status: 400 });
   }
-  if (!Number.isFinite(startInst) || startInst < minBookableInstant(config.hostTz, config.minNoticeDays)) {
+  if (
+    !Number.isFinite(startInst) ||
+    startInst < minBookableInstant(config.hostTz, config.minNoticeDays) ||
+    startInst >= maxBookableInstant(config.hostTz, config.maxAdvanceDays)
+  ) {
     return NextResponse.json({ error: "That time is no longer available." }, { status: 400 });
   }
   if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });

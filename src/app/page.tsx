@@ -14,6 +14,7 @@ export default function Page() {
         workEndHour: config.workEndHour,
         allowWeekends: config.allowWeekends,
         minNoticeDays: config.minNoticeDays,
+        maxAdvanceDays: config.maxAdvanceDays,
       }}
     />
   );

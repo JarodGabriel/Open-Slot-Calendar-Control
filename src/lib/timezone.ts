@@ -85,3 +85,23 @@ export function minBookableInstant(hostTz: string, minNoticeDays: number, now: n
   const floor = instantFromHostWall(+p.year, +p.month - 1, +p.day + minNoticeDays, 0, 0, hostTz);
   return Math.max(now, floor);
 }
+
+/**
+ * Latest instant a slot may start, given a maximum booking horizon in whole
+ * calendar days (host tz). maxAdvanceDays<=0 → no limit (Infinity). Otherwise the
+ * last bookable day is (host-today + maxAdvanceDays), fully available.
+ */
+export function maxBookableInstant(hostTz: string, maxAdvanceDays: number, now: number = Date.now()): number {
+  if (maxAdvanceDays <= 0) return Infinity;
+  const p: Record<string, string> = {};
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: hostTz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+    .formatToParts(new Date(now))
+    .forEach((x) => (p[x.type] = x.value));
+  // Midnight after the last bookable day → whole window is selectable.
+  return instantFromHostWall(+p.year, +p.month - 1, +p.day + maxAdvanceDays + 1, 0, 0, hostTz);
+}
